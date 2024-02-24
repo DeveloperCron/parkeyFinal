@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "362563148147",
+    "project_id": "parkey-a4557",
+    "storage_bucket": "parkey-a4557.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:362563148147:android:7f58bdd602640bfd278d06",
+        "android_client_info": {
+          "package_name": "com.parkey"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "362563148147-i31vfh9to6856pvc67tp1mg1a6hd2ipt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.parkey",
+            "certificate_hash": "607ba64e537a2ae6a39951866f2141f3cfd3e0c8"
+          }
+        },
+        {
+          "client_id": "362563148147-a8900c1kpvefggfpbfeadrser6o4t7j1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCt3hgqmRr5NU21WizcVMUxxcPRaO51IH4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "362563148147-a8900c1kpvefggfpbfeadrser6o4t7j1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "362563148147-7g7b0fmcb0p745ug8mb1421p7aqom2kp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.parkey"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

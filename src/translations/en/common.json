@@ -1,6 +1,7 @@
 {
-  "appName": {
-    "full": "React Native parkey",
-    "initials": "RNB"
-  }
+	"appName": {
+		"full": "React Native parkey",
+		"initials": "RNB"
+	},
+	"google-button": "Sign in with Google"
 }

@@ -1,0 +1,7 @@
+{
+	"header": "Sign in",
+	"header-description": "Please sign in to continue using our app",
+	"emailField": "Email",
+	"passwordField": "password",
+	"signin-button": "Sign in"
+}

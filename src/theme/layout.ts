@@ -1,64 +1,64 @@
-import { ViewStyle } from 'react-native';
+import { ViewStyle } from "react-native"
 
 export default {
 	col: {
-		flexDirection: 'column',
+		flexDirection: "column",
 	},
 	colReverse: {
-		flexDirection: 'column-reverse',
+		flexDirection: "column-reverse",
 	},
 	wrap: {
-		flexWrap: 'wrap',
+		flexWrap: "wrap",
 	},
 	row: {
-		flexDirection: 'row',
+		flexDirection: "row",
 	},
 	rowReverse: {
-		flexDirection: 'row-reverse',
+		flexDirection: "row-reverse",
 	},
 	itemsCenter: {
-		alignItems: 'center',
+		alignItems: "center",
 	},
 	itemsStart: {
-		alignItems: 'flex-start',
+		alignItems: "flex-start",
 	},
 	itemsStretch: {
-		alignItems: 'stretch',
+		alignItems: "stretch",
 	},
 	itemsEnd: {
-		alignItems: 'flex-end',
+		alignItems: "flex-end",
 	},
 	justifyCenter: {
-		justifyContent: 'center',
+		justifyContent: "center",
 	},
 	justifyAround: {
-		justifyContent: 'space-around',
+		justifyContent: "space-around",
 	},
 	justifyBetween: {
-		justifyContent: 'space-between',
+		justifyContent: "space-between",
 	},
 	justifyEnd: {
-		justifyContent: 'flex-end',
+		justifyContent: "flex-end",
 	},
 	justifyStart: {
-		justifyContent: 'flex-start',
+		justifyContent: "flex-start",
 	},
 	/* Sizes Layouts */
 	flex_1: {
 		flex: 1,
 	},
 	fullWidth: {
-		width: '100%',
+		width: "100%",
 	},
 	fullHeight: {
-		height: '100%',
+		height: "100%",
 	},
 	/* Positions */
 	relative: {
-		position: 'relative',
+		position: "relative",
 	},
 	absolute: {
-		position: 'absolute',
+		position: "absolute",
 	},
 	top0: {
 		top: 0,
@@ -78,4 +78,4 @@ export default {
 	z10: {
 		zIndex: 10,
 	},
-} as const satisfies Record<string, ViewStyle>;
+} as const satisfies Record<string, ViewStyle>

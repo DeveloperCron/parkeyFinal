@@ -1,23 +1,24 @@
-import { View, DimensionValue } from 'react-native';
+import { View, DimensionValue } from "react-native"
+import React from "react"
 
-import LogoLight from '@/theme/assets/images/tom_light.png';
-import LogoDark from '@/theme/assets/images/tom_dark.png';
+import LogoLight from "@/theme/assets/images/tom_light.png"
+import LogoDark from "@/theme/assets/images/tom_dark.png"
 
-import { ImageVariant } from '@/components/atoms';
-import { useTheme } from '@/theme';
-import { isImageSourcePropType } from '@/types/guards/image';
+import { ImageVariant } from "@/components/atoms"
+import { useTheme } from "@/theme"
+import { isImageSourcePropType } from "@/types/guards/image"
 
 type Props = {
-	height?: DimensionValue;
-	width?: DimensionValue;
-	mode?: 'contain' | 'cover' | 'stretch' | 'repeat' | 'center';
-};
+	height?: DimensionValue
+	width?: DimensionValue
+	mode?: "contain" | "cover" | "stretch" | "repeat" | "center"
+}
 
 function Brand({ height, width, mode }: Props) {
-	const { layout } = useTheme();
+	const { layout } = useTheme()
 
 	if (!isImageSourcePropType(LogoLight) || !isImageSourcePropType(LogoDark)) {
-		throw new Error('Image source is not valid');
+		throw new Error("Image source is not valid")
 	}
 
 	return (
@@ -30,13 +31,13 @@ function Brand({ height, width, mode }: Props) {
 				resizeMode={mode}
 			/>
 		</View>
-	);
+	)
 }
 
 Brand.defaultProps = {
 	height: 200,
 	width: 200,
-	mode: 'contain',
-};
+	mode: "contain",
+}
 
-export default Brand;
+export default Brand

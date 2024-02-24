@@ -1,2 +1,7 @@
-export { default as ThemeProvider } from './ThemeProvider/ThemeProvider';
-export { default as useTheme } from './hooks/useTheme';
+export { default as ThemeProvider } from "./ThemeProvider/ThemeProvider"
+export { default as useTheme } from "./hooks/useTheme"
+export * from "./colors"
+export * from "./spacing"
+export * from "./typography"
+export * from "./timing"
+export { default as PaperTheme } from "./paperTheme"
