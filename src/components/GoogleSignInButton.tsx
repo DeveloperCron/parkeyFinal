@@ -1,4 +1,4 @@
-import React, { FC, useCallback, memo, useMemo, ComponentType } from "react"
+import React, { FC, useCallback, useMemo, ComponentType } from "react"
 import { TextStyle, ViewStyle } from "react-native"
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
 import Icon from "react-native-vector-icons/AntDesign"
@@ -9,8 +9,9 @@ import { colors, spacing } from "@/theme"
 import { Button, ButtonAccessoryProps } from "./Button"
 import { useTranslation } from "react-i18next"
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 type IGoogleSignInButtonProps = {}
-const GoogleSignInButton: FC<IGoogleSignInButtonProps> = () => {
+export const GoogleSignInButton: FC<IGoogleSignInButtonProps> = () => {
 	const { t } = useTranslation(["login", "common"])
 
 	async function loginWithGoogle() {
@@ -21,15 +22,17 @@ const GoogleSignInButton: FC<IGoogleSignInButtonProps> = () => {
 	}
 
 	const onButtonTap = useCallback(() => {
-		loginWithGoogle().catch((error: FirebaseAuthTypes.NativeFirebaseAuthError) =>
-			crashlytics().recordError(new Error(error.code)),
-		)
+		loginWithGoogle()
+			.then(() => console.log("Sign in with google"))
+			.catch((error: FirebaseAuthTypes.NativeFirebaseAuthError) =>
+				crashlytics().recordError(new Error(error.code)),
+			)
 	}, [])
 
 	const GoogleLeftAccessory: ComponentType<ButtonAccessoryProps> = useMemo(
 		() =>
 			function GoogleRightAccessory(_: ButtonAccessoryProps) {
-				return <Icon name="google" size={24} color={colors.palette.neutral800} />
+				return <Icon name="google" size={24} color={colors.palette.BlackAlpha["700"]} />
 			},
 		[],
 	)
@@ -38,23 +41,22 @@ const GoogleSignInButton: FC<IGoogleSignInButtonProps> = () => {
 		<Button
 			testID="google-button"
 			text={t("common:google-button")}
-			style={$buttonStyle}
+			style={$buttonContainerStyle}
 			preset="reversed"
-			textStyle={$buttonText}
+			textStyle={$buttonTextStyle}
 			LeftAccessory={GoogleLeftAccessory}
 			onPress={onButtonTap}
 		/>
 	)
 }
 
-const $buttonStyle: ViewStyle = {
-	backgroundColor: colors.blackAlpha[400],
-	borderRadius: 12,
+const $buttonContainerStyle: ViewStyle = {
+	backgroundColor: colors.blackAlpha[200],
+	borderRadius: 50,
+	height: 60,
 	gap: spacing.sm,
 }
 
-const $buttonText: TextStyle = {
-	color: colors.text,
+const $buttonTextStyle: TextStyle = {
+	color: colors.blackAlpha[700],
 }
-
-export default memo(GoogleSignInButton)

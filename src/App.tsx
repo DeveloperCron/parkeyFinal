@@ -16,6 +16,7 @@ import { MMKV } from "react-native-mmkv"
 import { PaperProvider } from "react-native-paper"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import Geolocation from "@react-native-community/geolocation"
 
 import { ThemeProvider, PaperTheme } from "@/theme"
 
@@ -26,6 +27,9 @@ import { ViewStyle } from "react-native"
 const queryClient = new QueryClient()
 
 export const storage = new MMKV()
+// Geolocation will be our main location library instead of expo's bloated libs
+const locationConfig = { skipPermissionRequests: false, authorizationLevel: "whenInUse" }
+Geolocation.setRNConfiguration(locationConfig)
 
 function App() {
 	return (

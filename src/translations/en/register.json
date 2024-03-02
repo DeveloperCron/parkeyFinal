@@ -3,7 +3,6 @@
 	"header-description": "Connect to a gate today!",
 	"emailField": "Email",
 	"passwordField": "password",
-	"signin-button": "Sign in",
-	"forgot-button": "Forgot password?",
-	"signup-button": "Don't have an account? Create!"
+	"signup-button": "Sign up",
+	"signin-button": "Already have an account? Login!"
 }

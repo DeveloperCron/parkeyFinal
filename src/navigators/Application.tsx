@@ -1,15 +1,28 @@
 import React, { useState, useEffect } from "react"
-import { createStackNavigator } from "@react-navigation/stack"
+import { createNativeStackNavigator, NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { NavigationContainer } from "@react-navigation/native"
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
 
-import { Example, Startup, LoginScreen } from "@/screens"
+import { Example, Startup, LoginScreen, RegisterScreen, MapScreen } from "@/screens"
 import { useTheme } from "@/theme"
 
 import type { ApplicationStackParamList } from "@/types/navigation"
 
-const Stack = createStackNavigator<ApplicationStackParamList>()
+const Stack = createNativeStackNavigator<ApplicationStackParamList>()
+export type AppStackNavigator = NativeStackNavigationProp<ApplicationStackParamList>
+
+const config = {
+	animation: "spring",
+	config: {
+		stiffness: 1000,
+		damping: 500,
+		mass: 3,
+		overshootClamping: true,
+		restDisplacementThreshold: 0.01,
+		restSpeedThreshold: 0.01,
+	},
+}
 
 function ApplicationNavigator() {
 	const { navigationTheme, changeTheme } = useTheme()
@@ -39,12 +52,22 @@ function ApplicationNavigator() {
 		<NavigationContainer theme={navigationTheme}>
 			<Stack.Navigator screenOptions={{ headerShown: false }}>
 				{currentUser ? (
-					<></>
+					<>
+						<Stack.Screen name="MapScreen" component={MapScreen} />
+					</>
 				) : (
 					<>
-						<Stack.Screen name="LoginScreen" component={LoginScreen} />
-						<Stack.Screen name="Startup" component={Startup} />
-						<Stack.Screen name="Example" component={Example} />
+						<Stack.Screen
+							name="LoginScreen"
+							component={LoginScreen}
+							options={{
+								animation: "simple_push",
+							}}
+						/>
+						<Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+
+						{/* <Stack.Screen name="Startup" component={Startup} />
+						<Stack.Screen name="Example" component={Example} /> */}
 					</>
 				)}
 			</Stack.Navigator>

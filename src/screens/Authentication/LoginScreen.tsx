@@ -1,51 +1,61 @@
 import React, { useCallback, useState, memo, FC } from "react"
 import { View, ViewStyle, TextStyle } from "react-native"
-import { Screen, Button, Text } from "@/components"
+import { Screen, Button, Text, OrSection, GoogleSignInButton } from "@/components"
 import { Snackbar, TextInput } from "react-native-paper"
 import { useTranslation } from "react-i18next"
 import { colors, spacing } from "@/theme"
 
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
 import crashlytics from "@react-native-firebase/crashlytics"
-import GoogleSignInButton from "@/components/GoogleSignInButton"
+import TextButton from "@/components/TextButton"
+import { AppStackNavigator } from "@/navigators/Application"
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface ILoginScreenProps {}
-const LoginScreen: FC<ILoginScreenProps> = () => {
+interface ILoginScreenProps {
+	navigation: AppStackNavigator
+}
+const LoginScreen: FC<ILoginScreenProps> = ({ navigation }) => {
 	const [email, setEmail] = useState<string>("")
 	const [password, setPassword] = useState<string>("")
 	const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState<boolean>(true)
 	const [errorVisible, setErrorVisible] = useState<boolean>(false)
 	const [errorMessage, setErrorMessage] = useState<string>("")
+
 	const { t } = useTranslation(["login"])
 
 	const onDismissSnackBar = () => setErrorVisible(false)
 	const onLoginButtonPress = useCallback(() => {
-		auth()
-			.signInWithEmailAndPassword(email, password)
-			.catch((error: FirebaseAuthTypes.NativeFirebaseAuthError) => {
-				crashlytics().recordError(new Error(error.code))
+		// Auth can't receive empty text that has 0 chars
+		if (email.length != 0 && password.length != 0) {
+			auth()
+				.signInWithEmailAndPassword(email, password)
+				.catch((error: FirebaseAuthTypes.NativeFirebaseAuthError) => {
+					crashlytics().recordError(new Error(error.code))
 
-				const { message, code } = error
-				if (code === "auth/invalid-email") {
-					if (!error) setErrorVisible(!error)
-					setErrorMessage(message)
-				}
+					const { message, code } = error
+					if (code === "auth/invalid-email") {
+						if (!error) setErrorVisible(!error)
+						setErrorMessage(message)
+					}
 
-				if (code === "auth/invalid-password") {
-					if (!error) setErrorVisible(!error)
-					setErrorMessage(message)
-				}
-			})
-	}, [])
+					if (code === "auth/invalid-password") {
+						if (!error) setErrorVisible(!error)
+						setErrorMessage(message)
+					}
+				})
+		} else {
+			setErrorMessage("One of the fields are empty")
+			setErrorVisible(true)
+		}
+	}, [email, password])
 
 	return (
-		<Screen contentContainerStyle={$container}>
+		<Screen contentContainerStyle={$container} safeAreaEdges={["top"]}>
 			<View style={$header}>
-				<Text style={$headerTitle} size="xxl" weight="bold">
+				<Text style={$headerTitle} size="xl" weight="bold">
 					{t("login:header")}
 				</Text>
-				<Text style={$headerDescription} size="sm" weight="bold">
+				<Text style={$headerDescription} size="xs" weight="bold">
 					{t("login:header-description")}
 				</Text>
 			</View>
@@ -77,6 +87,7 @@ const LoginScreen: FC<ILoginScreenProps> = () => {
 					autoComplete="password"
 				/>
 			</View>
+			<TextButton text={t("login:forgot-button")} alignment="end" />
 			<View style={$actionsContainer}>
 				<Button
 					text={t("login:signin-button")}
@@ -84,8 +95,14 @@ const LoginScreen: FC<ILoginScreenProps> = () => {
 					preset="reversed"
 					onPress={onLoginButtonPress}
 				/>
+				<OrSection />
 				<GoogleSignInButton />
 			</View>
+			<TextButton
+				text={t("login:signup-button")}
+				alignment="center"
+				onPress={() => navigation.navigate("RegisterScreen")}
+			/>
 			<Snackbar visible={errorVisible} onDismiss={onDismissSnackBar}>
 				{errorMessage}
 			</Snackbar>
@@ -93,35 +110,41 @@ const LoginScreen: FC<ILoginScreenProps> = () => {
 	)
 }
 
+export default memo(LoginScreen)
+
 const $container: ViewStyle = {
 	width: "100%",
 	height: "100%",
-	justifyContent: "center",
 	alignItems: "center",
 	display: "flex",
-	gap: 20,
+	gap: 10,
 	padding: 10,
 }
 
 const $header: ViewStyle = {
-	width: "100%",
-	height: "auto",
-	display: "flex",
+	width: "95%",
+	height: 220,
+	gap: 10,
+	justifyContent: "center",
 }
 
 const $headerTitle: TextStyle = {
 	color: colors.palette.neutral800,
+	fontWeight: "bold",
+	fontSize: 32,
 }
 
 const $headerDescription: TextStyle = {
 	color: colors.palette.neutral600,
+	fontSize: 16,
 }
 
 const $actionsContainer: ViewStyle = {
-	width: "100%",
+	width: "95%",
 	height: "auto",
 	display: "flex",
 	flexDirection: "column",
+	gap: 6,
 }
 
 const $inputsContainer: ViewStyle = {
@@ -129,13 +152,12 @@ const $inputsContainer: ViewStyle = {
 	display: "flex",
 	height: "auto",
 	flexDirection: "column",
-	gap: 5,
+	gap: 20,
 }
 
 const $signInButton: ViewStyle = {
 	marginTop: spacing.xs,
-	backgroundColor: colors.blue[400],
-	borderRadius: 12,
+	backgroundColor: colors.blue[500],
+	borderRadius: 50,
+	height: 60,
 }
-
-export default memo(LoginScreen)
