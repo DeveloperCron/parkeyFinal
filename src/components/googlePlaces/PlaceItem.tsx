@@ -29,7 +29,7 @@ const $pressableContainer: ViewStyle = {
 	height: 70,
 	flexDirection: "row",
 	alignItems: "center",
-	gap: 10,
+	gap: 12,
 }
 
 const $textContainer: ViewStyle = {
@@ -42,6 +42,7 @@ const $textContainer: ViewStyle = {
 
 const $textStyle: TextStyle = {
 	color: colors.palette.neutral600,
+	fontWeight: "bold",
 }
 
 export default PlaceItem

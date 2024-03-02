@@ -21,8 +21,9 @@ export type PredictionType = {
 
 export interface GooglePlaceFlatlistProps {
 	searchResult: string
+	placeSelected: (item: PredictionType) => void
 }
-const GooglePlaceFlatlist: FC<GooglePlaceFlatlistProps> = ({ searchResult, ...props }) => {
+const GooglePlaceFlatlist: FC<GooglePlaceFlatlistProps> = ({ searchResult, placeSelected, ...rest }) => {
 	const [predictions, setPredictions] = useState<PredictionType[]>([])
 
 	const requestPlaces = async (): Promise<void> => {
@@ -53,17 +54,18 @@ const GooglePlaceFlatlist: FC<GooglePlaceFlatlistProps> = ({ searchResult, ...pr
 
 	return (
 		<FlatList
+			{...rest}
 			style={$flatListStyle}
 			data={predictions}
 			ItemSeparatorComponent={Divider}
-			renderItem={({ item }) => <PlaceItem placeName={item.description} />}
+			renderItem={({ item }) => <PlaceItem placeName={item.description} onPress={() => placeSelected(item)} />}
 			keyExtractor={(item) => item.place_id.toString()}
 		/>
 	)
 }
 
 const $flatListStyle: ViewStyle = {
-	width: "95%",
+	width: "90%",
 	height: "60%",
 	backgroundColor: colors.palette.neutral100,
 }

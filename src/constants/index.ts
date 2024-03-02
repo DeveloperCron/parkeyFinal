@@ -1,0 +1,1 @@
+export const RECENT_PLACES_KEY = "RECENT_PLACES"

@@ -13,12 +13,12 @@ import { GeolocationError, GeolocationPosition } from "@/types/geolocation"
 import FakeSearchbox from "@/components/googlePlaces/FakeSearchbox"
 
 import { Screen } from "@/components"
-import SearchPortal from "@/screens/SearchPortal"
+import SearchPortal from "@/screens/Main/SearchPortal"
 
 const ANIMATION_DURATION = 1000
 const GEOLOCATION_TIMEOUT = 20000
 const MAXIMUM_AGE = 1000
-const ENABLE_HIGH_ACCURACY = true
+const ENABLE_HIGH_ACCURACY = false
 
 const styles = StyleSheet.create({
 	container: {
@@ -77,8 +77,8 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
 					{
 						latitude: coords.latitude,
 						longitude: coords.longitude,
-						longitudeDelta: 0.03,
-						latitudeDelta: 0.03,
+						longitudeDelta: 0.003,
+						latitudeDelta: 0.003,
 					},
 					ANIMATION_DURATION,
 				)
@@ -134,6 +134,8 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
 				style={styles.map}
 				showsUserLocation
 				showsMyLocationButton={false}
+				followsUserLocation
+				userLocationCalloutEnabled
 				ref={mapRef}
 				region={{
 					latitude: 37.78825,
