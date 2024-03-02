@@ -2,20 +2,17 @@ import React, { FC, createRef, useCallback, useEffect, useRef, useMemo, useState
 import { observer } from "mobx-react-lite"
 import crashlytics from "@react-native-firebase/crashlytics"
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps"
-
 import { Alert, PermissionsAndroid, Platform, StyleSheet } from "react-native"
 import Geolocation from "@react-native-community/geolocation"
-
 import { LocationButton } from "@/components"
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet"
-
 import { GeolocationError, GeolocationPosition } from "@/types/geolocation"
 import FakeSearchbox from "@/components/googlePlaces/FakeSearchbox"
-
 import { Screen } from "@/components"
 import SearchPortal from "@/screens/Main/SearchPortal"
+import { MAP_STYLING } from "@/constants"
 
-const ANIMATION_DURATION = 1000
+const ANIMATION_DURATION = 2000
 const GEOLOCATION_TIMEOUT = 20000
 const MAXIMUM_AGE = 1000
 const ENABLE_HIGH_ACCURACY = false
@@ -137,6 +134,7 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
 				followsUserLocation
 				userLocationCalloutEnabled
 				ref={mapRef}
+				customMapStyle={MAP_STYLING}
 				region={{
 					latitude: 37.78825,
 					longitude: -122.4324,

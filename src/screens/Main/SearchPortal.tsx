@@ -32,17 +32,12 @@ const SearchPortal: FC<SearchPortalProps> = ({ onCloseButtonPress, onPlaceChosen
 		console.log(retrieveItems())
 	}, [])
 
-	// Focus the searchbox when mounting
-	useEffect(() => {
-		searchboxRef.current?.focus()
-	}, [])
-
 	return (
 		<Portal.Host>
 			<View style={styles.container}>
 				<Animated.View
 					style={styles.contentContainer}
-					entering={SlideInDown.duration(300).springify().mass(0.1)}
+					entering={SlideInDown.duration(1000).springify().mass(0.1)}
 					exiting={SlideOutDown.duration(300)}
 				>
 					<View style={styles.portalHeader}>
