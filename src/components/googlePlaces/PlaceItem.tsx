@@ -13,7 +13,7 @@ export interface PlaceItemProps extends PressableProps {
 
 const PlaceItem: FC<PlaceItemProps> = ({ placeName, ...props }) => {
 	return (
-		<Pressable style={$pressableContainer} {...props}>
+		<Pressable style={$container} {...props}>
 			<Icon name="location-dot" size={24} color={colors.palette.neutral600} />
 			<View style={$textContainer}>
 				<Text size="xs" weight="semiBold" style={$textStyle}>
@@ -24,7 +24,7 @@ const PlaceItem: FC<PlaceItemProps> = ({ placeName, ...props }) => {
 	)
 }
 
-const $pressableContainer: ViewStyle = {
+const $container: ViewStyle = {
 	width: "100%",
 	height: 70,
 	flexDirection: "row",

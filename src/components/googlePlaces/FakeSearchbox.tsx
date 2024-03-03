@@ -15,7 +15,7 @@ const FakeSearchbox: FC<FakeSearchboxProps> = ({ ...rest }) => {
 }
 
 const $pressableStyle: ViewStyle = {
-	width: "100%",
+	width: "85%",
 	height: "auto",
 	alignItems: "center",
 	justifyContent: "center",

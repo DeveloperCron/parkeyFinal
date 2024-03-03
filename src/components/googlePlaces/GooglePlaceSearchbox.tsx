@@ -41,7 +41,7 @@ const GooglePlaceSearchbox = forwardRef<RNTextInput, GooglePlaceSearchboxProps>(
 
 const $searchbarContainer: ViewStyle = {
 	width: "100%",
-	height: 70,
+	height: 65,
 	borderRadius: 50,
 	justifyContent: "center",
 	alignItems: "center",

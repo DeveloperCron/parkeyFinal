@@ -2,15 +2,19 @@ import React, { FC, createRef, useCallback, useEffect, useRef, useMemo, useState
 import { observer } from "mobx-react-lite"
 import crashlytics from "@react-native-firebase/crashlytics"
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps"
-import { Alert, PermissionsAndroid, Platform, StyleSheet } from "react-native"
+import { Alert, PermissionsAndroid, Platform, StyleSheet, View, Pressable } from "react-native"
 import Geolocation from "@react-native-community/geolocation"
 import { LocationButton } from "@/components"
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet"
 import { GeolocationError, GeolocationPosition } from "@/types/geolocation"
 import FakeSearchbox from "@/components/googlePlaces/FakeSearchbox"
-import { Screen } from "@/components"
+import { Screen, Text, Button } from "@/components"
 import SearchPortal from "@/screens/Main/SearchPortal"
 import { MAP_STYLING } from "@/constants"
+import RecentPlacesFlatList from "@/components/recentPlaces/RecentPlacesFlatList"
+import { colors } from "@/theme"
+
+import Icon from "react-native-vector-icons/Feather"
 
 const ANIMATION_DURATION = 2000
 const GEOLOCATION_TIMEOUT = 20000
@@ -34,7 +38,29 @@ const styles = StyleSheet.create({
 	screenContainer: {
 		...StyleSheet.absoluteFillObject,
 	},
+	closeButtonContainer: {
+		backgroundColor: colors.palette.neutral200,
+		height: 65,
+		width: 65,
+		borderRadius: 50,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	bottomSheetHeaderContainer: {
+		width: "100%",
+		height: "auto",
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+		gap: 5,
+	},
 })
+
+const CloseButton: FC<{ onPress: () => void }> = ({ onPress }) => (
+	<Pressable style={styles.closeButtonContainer} onPress={onPress}>
+		<Icon name="menu" size={24} color={colors.palette.neutral500} />
+	</Pressable>
+)
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type MapScreenProps = {}
@@ -43,8 +69,7 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
 	const [index, setIndex] = useState<number>(0)
 	const bottomSheetRef = useRef<BottomSheet>(null)
 	const mapRef = createRef<MapView>()
-
-	const snapPoints = useMemo(() => ["15%", "40%", "50%"], [])
+	const snapPoints = useMemo(() => ["15%", "40%", "60%"], [])
 
 	// callbacks
 	const handleSheetChanges = useCallback((newIndex: number) => {
@@ -134,7 +159,6 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
 				followsUserLocation
 				userLocationCalloutEnabled
 				ref={mapRef}
-				customMapStyle={MAP_STYLING}
 				region={{
 					latitude: 37.78825,
 					longitude: -122.4324,
@@ -144,12 +168,24 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
 			/>
 
 			<LocationButton onPress={getCurrentUserPosition} bottomInset={snapPoints[index]} />
-			<BottomSheet ref={bottomSheetRef} onChange={handleSheetChanges} index={index} snapPoints={snapPoints}>
+			<BottomSheet
+				ref={bottomSheetRef}
+				onChange={handleSheetChanges}
+				enableContentPanningGesture={false}
+				index={index}
+				snapPoints={snapPoints}
+			>
 				<BottomSheetView style={styles.bottomSheetContainer}>
-					<FakeSearchbox onPress={handleSearchboxVisibility} />
+					<View style={styles.bottomSheetHeaderContainer}>
+						<CloseButton onPress={() => console.log("Hello")} />
+						<FakeSearchbox onPress={handleSearchboxVisibility} />
+					</View>
+					<RecentPlacesFlatList onItemSelected={() => console.log("Hi")} />
 				</BottomSheetView>
 			</BottomSheet>
-			{searchPortalVisible && <SearchPortal onCloseButtonPress={handleSearchboxVisibility} />}
+			{searchPortalVisible && (
+				<SearchPortal onCloseButtonPress={handleSearchboxVisibility} onPlaceChosen={() => console.log("Hi")} />
+			)}
 		</Screen>
 	)
 })
