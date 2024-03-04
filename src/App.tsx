@@ -17,7 +17,6 @@ import { MMKVLoader } from "react-native-mmkv-storage"
 import { PaperProvider } from "react-native-paper"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import Geolocation from "@react-native-community/geolocation"
 
 import { ThemeProvider, PaperTheme } from "@/theme"
 
@@ -28,11 +27,7 @@ import { RECENT_PLACES_KEY } from "./constants"
 
 const queryClient = new QueryClient()
 export const storage = new StorageMMKV()
-// Encrypted into the device
 export const recentPlaces = new MMKVLoader().withEncryption().withInstanceID(RECENT_PLACES_KEY).initialize()
-// Geolocation will be our main location library instead of expo's bloated libs
-const locationConfig = { skipPermissionRequests: false, authorizationLevel: "whenInUse" }
-Geolocation.setRNConfiguration(locationConfig)
 
 function App() {
 	return (

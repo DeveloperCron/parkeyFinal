@@ -10,7 +10,7 @@ import { colors } from "@/theme"
 import SkeletonList from "../SkeletonList"
 
 export interface RecentPlacesFlatListProps {
-	onItemSelected: () => void
+	onItemSelected: (item: PredictionType) => void
 }
 
 const RecentPlacesFlatList: FC<RecentPlacesFlatListProps> = ({ onItemSelected }) => {
@@ -47,7 +47,9 @@ const RecentPlacesFlatList: FC<RecentPlacesFlatListProps> = ({ onItemSelected })
 			nestedScrollEnabled
 			scrollEnabled
 			contentContainerStyle={{ flexGrow: 1 }}
-			renderItem={({ item }) => <RecentItem placeName={item.description} onRecentItemPress={onItemSelected} />}
+			renderItem={({ item }) => (
+				<RecentItem placeName={item.description} onRecentItemPress={() => onItemSelected(item)} />
+			)}
 			keyExtractor={(item) => item.place_id.toString()}
 		/>
 	)

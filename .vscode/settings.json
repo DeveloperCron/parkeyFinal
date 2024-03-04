@@ -3,5 +3,6 @@
     "java.configuration.updateBuildConfiguration": "interactive",
     "cSpell.words": [
         "Pressable"
-    ]
+    ],
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

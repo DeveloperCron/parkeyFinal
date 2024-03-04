@@ -2,14 +2,11 @@ import React, { forwardRef, ForwardedRef, ReactElement } from "react"
 import { TextInput, TextInputProps } from "react-native-paper"
 import { TextInput as RNTextInput, TextStyle, View, ViewStyle } from "react-native"
 import { colors } from "@/theme"
+import { useTranslation } from "react-i18next"
 
 import Icon from "react-native-vector-icons/FontAwesome"
 
 export interface GooglePlaceSearchboxProps extends TextInputProps {
-	/**
-	 * Default text to be shown on the TextInput
-	 */
-	placeHolder?: string
 	/**
 	 * Display icon/button on the right
 	 */
@@ -17,9 +14,11 @@ export interface GooglePlaceSearchboxProps extends TextInputProps {
 }
 
 const GooglePlaceSearchbox = forwardRef<RNTextInput, GooglePlaceSearchboxProps>(function GooglePlaceSearchbox(
-	{ placeHolder, RightAccessory, ...rest },
+	{ RightAccessory, ...rest },
 	ref: ForwardedRef<RNTextInput>,
 ) {
+	const { t } = useTranslation(["map"])
+
 	return (
 		<View style={$searchbarContainer}>
 			<Icon name="search" size={22} color={colors.palette.neutral500} />
@@ -27,7 +26,7 @@ const GooglePlaceSearchbox = forwardRef<RNTextInput, GooglePlaceSearchboxProps>(
 				theme={undefined}
 				placeholderTextColor={colors.palette.neutral500}
 				textColor={colors.palette.neutral500}
-				placeholder={placeHolder}
+				placeholder={t("map:searchbartext")}
 				outlineStyle={$outlineStyle}
 				style={$textInputStyle}
 				mode="outlined"

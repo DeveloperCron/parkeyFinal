@@ -1,42 +1,51 @@
 // Importing necessary modules and types
-import React, { FC, createRef, useCallback, useEffect, useRef, useMemo, useState } from "react"
+import React, { FC, useCallback, useEffect, useRef, useMemo, useState } from "react"
 import { observer } from "mobx-react-lite"
 import crashlytics from "@react-native-firebase/crashlytics"
-import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps"
-import { Alert, PermissionsAndroid, Platform, StyleSheet, View, Pressable } from "react-native"
-import Geolocation from "@react-native-community/geolocation"
-import { GeolocationError, GeolocationPosition } from "@/types/geolocation"
+import MapView, { PROVIDER_GOOGLE, Region, Marker, LatLng } from "react-native-maps"
+import { PermissionsAndroid, Platform, StyleSheet, View, Pressable } from "react-native"
+import Geolocation, { GeoError, GeoPosition } from "react-native-geolocation-service"
 import { LocationButton } from "@/components"
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet"
 import { Screen } from "@/components"
 import SearchPortal from "@/screens/Main/SearchPortal"
 import RecentPlacesFlatList from "@/components/recentPlaces/RecentPlacesFlatList"
 import { colors } from "@/theme"
-import Icon from "react-native-vector-icons/Feather"
 import { PredictionType } from "@/components/googlePlaces/GooglePlacesFlatList"
 import { usePlaceDetails } from "@/hooks/usePlaceDetails"
 import FakeSearchbox from "@/components/googlePlaces/FakeSearchbox"
+import { GATES_DICTIONARY } from "@/constants"
+
+import FeatherIcon from "react-native-vector-icons/Feather"
+import Ionicons from "react-native-vector-icons/Ionicons"
+import FAIcon from "react-native-vector-icons/FontAwesome6"
+import useStorage from "@/hooks/useStorage"
+import { AppStackNavigator } from "@/navigators/Application"
 
 // Constants
-const ANIMATION_DURATION = 2000
-const GEOLOCATION_TIMEOUT = 20000
-const MAXIMUM_AGE = 1000
-const ENABLE_HIGH_ACCURACY = false
+const ANIMATION_DURATION = 1000
 const LATITUDES = 0.003
 
 // Typings for the component props
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface MapScreenProps {}
+interface MapScreenProps {
+	navigation: AppStackNavigator
+}
 
 // Main component
-const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
+const MapScreen: FC<MapScreenProps> = observer(function MapScreen({ navigation }) {
 	// State and ref declarations
 	const [searchPortalVisible, setSearchPortalVisible] = useState<boolean>(false)
 	const [searchResultLocation, setSearchResultLocation] = useState<Region | undefined>(undefined)
+	const [currentUserLocation, setCurrentUserLocation] = useState<LatLng>({
+		latitude: 32.6432432466,
+		longitude: 32.58283,
+	})
 	const [index, setIndex] = useState<number>(0)
 	const bottomSheetRef = useRef<BottomSheet>(null)
-	const mapRef = createRef<MapView>()
+	const mapRef = useRef<MapView>(null)
 	const snapPoints = useMemo(() => ["15%", "40%", "60%"], [])
+	const { insert } = useStorage()
 
 	// Custom hook for fetching place details
 	const { getDetails } = usePlaceDetails()
@@ -46,13 +55,32 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
 		setIndex(newIndex)
 	}, [])
 
-	// Requesting permissions on mount
+	// Requesting permissions on componentWillMount
 	useEffect(() => {
 		const subscription = async () => {
-			await requestPermissions()
+			try {
+				await requestPermissions()
+			} catch {
+				crashlytics().log("Request permissions failed")
+			}
 		}
 
 		subscription()
+	}, [])
+
+	// Fire on componentWillUnmount
+	useEffect(() => {
+		const clearGeolocationCache = async () => {
+			try {
+				await Geolocation.stopObserving()
+			} catch {
+				crashlytics().log("Cannot clearGeolocationCache")
+			}
+		}
+
+		return () => {
+			clearGeolocationCache().catch((e) => crashlytics().log(e))
+		}
 	}, [])
 
 	useEffect(() => {
@@ -71,14 +99,13 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
 
 	// Function to get current user position
 	const getCurrentUserPosition = useCallback(() => {
-		Geolocation.requestAuthorization(
-			() => crashlytics().log("Authorization complete"),
-			() => crashlytics().recordError(new Error("Error occurred in requestAuthorization")),
-		)
-
+		if (Platform.OS === "ios") {
+			Geolocation.requestAuthorization("whenInUse").catch((e) => crashlytics().log(e))
+		}
 		Geolocation.getCurrentPosition(
-			(position: GeolocationPosition) => {
+			(position: GeoPosition) => {
 				const { coords } = position
+				setCurrentUserLocation(coords)
 
 				mapRef.current?.animateToRegion(
 					{
@@ -90,8 +117,10 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
 					ANIMATION_DURATION,
 				)
 			},
-			(error: GeolocationError) => Alert.alert("Error", JSON.stringify(error)),
-			{ enableHighAccuracy: ENABLE_HIGH_ACCURACY, timeout: GEOLOCATION_TIMEOUT, maximumAge: MAXIMUM_AGE },
+			(error: GeoError) => {
+				crashlytics().recordError(new Error(error.message))
+			},
+			{ enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
 		)
 	}, [mapRef])
 
@@ -137,6 +166,7 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
 
 	// Function to handle selected place
 	const onPlaceSelected = useCallback((item: PredictionType) => {
+		insert(item)
 		// Uncomment and modify as needed
 		const tryToFetchResult = () => {
 			getDetails(item.place_id).then(({ data }) => {
@@ -153,21 +183,43 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
 		tryToFetchResult()
 	}, [])
 
+	const onRecentItemSelected = useCallback((item: PredictionType) => {
+		const fetchDetails = () => {
+			getDetails(item.place_id).then(({ data }) => {
+				setSearchResultLocation({
+					latitude: data.result.geometry.location.lat,
+					longitude: data.result.geometry.location.lng,
+					latitudeDelta: LATITUDES, // Adjust the value as needed
+					longitudeDelta: LATITUDES, // Adjust the value as needed
+				})
+			})
+		}
+
+		fetchDetails()
+	}, [])
+
 	return (
 		<Screen contentContainerStyle={styles.container}>
 			{/* MapView component */}
 			<MapView
 				provider={PROVIDER_GOOGLE}
 				style={styles.map}
-				showsUserLocation
-				showsMyLocationButton={true}
 				loadingEnabled
 				loadingIndicatorColor={colors.palette.neutral400}
 				onMapLoaded={getCurrentUserPosition}
-				followsUserLocation
-				userLocationCalloutEnabled
 				ref={mapRef}
-			></MapView>
+			>
+				{/** User location marker */}
+				<Marker key={index} coordinate={currentUserLocation} tracksViewChanges={false} title="Your location">
+					<Ionicons name="location-sharp" size={35} color={colors.palette.Blue[400]} />
+				</Marker>
+
+				{GATES_DICTIONARY.map((item, index) => (
+					<Marker key={index} coordinate={item.coords} tracksViewChanges={false}>
+						<FAIcon name="square-parking" size={30} color={colors.palette.neutral700} />
+					</Marker>
+				))}
+			</MapView>
 
 			{/* LocationButton component */}
 			<LocationButton onPress={getCurrentUserPosition} bottomInset={snapPoints[index]} />
@@ -184,14 +236,14 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
 					{/* BottomSheet header */}
 					<View style={styles.bottomSheetHeaderContainer}>
 						{/* CloseButton component */}
-						<MenuButton onPress={() => console.log("TO DO")} />
+						<MenuButton onPress={() => navigation.navigate("SettingsScreen")} />
 
 						{/* FakeSearchbox component */}
 						<FakeSearchbox onPress={handleSearchboxVisibility} />
 					</View>
 
 					{/* RecentPlacesFlatList component */}
-					<RecentPlacesFlatList />
+					<RecentPlacesFlatList onItemSelected={onRecentItemSelected} />
 				</BottomSheetView>
 			</BottomSheet>
 
@@ -205,7 +257,7 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen() {
 
 const MenuButton: FC<{ onPress: () => void }> = ({ onPress }) => (
 	<Pressable style={styles.menuButtonContainer} onPress={onPress}>
-		<Icon name="menu" size={24} color={colors.palette.neutral500} />
+		<FeatherIcon name="menu" size={24} color={colors.palette.neutral500} />
 	</Pressable>
 )
 

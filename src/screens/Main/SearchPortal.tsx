@@ -1,6 +1,6 @@
-import React, { useState, memo, FC, useCallback, useRef, useEffect } from "react"
+import React, { useState, memo, FC, useRef } from "react"
 import { Portal } from "react-native-paper"
-import { View, ViewStyle, StyleSheet, Pressable, TextStyle } from "react-native"
+import { View, StyleSheet, Pressable } from "react-native"
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated"
 import Icon from "react-native-vector-icons/AntDesign"
 import { colors } from "@/theme"
@@ -8,7 +8,6 @@ import GooglePlacesFlatList, { PredictionType } from "@/components/googlePlaces/
 import GooglePlaceSearchbox from "@/components/googlePlaces/GooglePlaceSearchbox"
 import { Text } from "@/components"
 import { useTranslation } from "react-i18next"
-import useStorage from "@/hooks/useStorage"
 
 interface SearchPortalProps {
 	onCloseButtonPress: () => void
@@ -24,7 +23,6 @@ const CloseButton: FC<{ onPress: () => void }> = ({ onPress }) => (
 const SearchPortal: FC<SearchPortalProps> = ({ onCloseButtonPress, onPlaceChosen }) => {
 	const [searchResult, setSearchResult] = useState<string>("")
 	const searchboxRef = useRef<React.ElementRef<typeof GooglePlaceSearchbox>>(null)
-	const { insert, retrieveItems } = useStorage()
 	const { t } = useTranslation(["map"])
 
 	return (
@@ -44,7 +42,6 @@ const SearchPortal: FC<SearchPortalProps> = ({ onCloseButtonPress, onPlaceChosen
 					<View style={styles.portalActions}>
 						<GooglePlaceSearchbox
 							ref={searchboxRef}
-							placeHolder={t("map:searchbartext")}
 							onChangeText={(text: string) => setSearchResult(text)}
 						/>
 					</View>

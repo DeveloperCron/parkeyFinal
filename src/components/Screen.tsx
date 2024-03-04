@@ -257,6 +257,8 @@ const $containerStyle: ViewStyle = {
 	flex: 1,
 	height: "100%",
 	width: "100%",
+	// Add this for the splash screen won't override the style
+	backgroundColor: colors.palette.neutral100,
 }
 
 const $keyboardAvoidingViewStyle: ViewStyle = {

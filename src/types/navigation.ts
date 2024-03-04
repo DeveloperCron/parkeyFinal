@@ -6,6 +6,7 @@ export type ApplicationStackParamList = {
 	LoginScreen: undefined
 	RegisterScreen: undefined
 	MapScreen: undefined
+	SettingsScreen: undefined
 }
 
 export type ApplicationScreenProps = StackScreenProps<ApplicationStackParamList>

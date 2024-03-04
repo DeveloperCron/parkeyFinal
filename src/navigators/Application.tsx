@@ -4,25 +4,13 @@ import { NavigationContainer } from "@react-navigation/native"
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
 
-import { Example, Startup, LoginScreen, RegisterScreen, MapScreen } from "@/screens"
+import { LoginScreen, RegisterScreen, MapScreen, SettingsScreen } from "@/screens"
 import { useTheme } from "@/theme"
 
 import type { ApplicationStackParamList } from "@/types/navigation"
 
 const Stack = createNativeStackNavigator<ApplicationStackParamList>()
 export type AppStackNavigator = NativeStackNavigationProp<ApplicationStackParamList>
-
-const config = {
-	animation: "spring",
-	config: {
-		stiffness: 1000,
-		damping: 500,
-		mass: 3,
-		overshootClamping: true,
-		restDisplacementThreshold: 0.01,
-		restSpeedThreshold: 0.01,
-	},
-}
 
 function ApplicationNavigator() {
 	const { navigationTheme, changeTheme } = useTheme()
@@ -65,9 +53,11 @@ function ApplicationNavigator() {
 							}}
 						/>
 						<Stack.Screen name="RegisterScreen" component={RegisterScreen} />
-
-						{/* <Stack.Screen name="Startup" component={Startup} />
-						<Stack.Screen name="Example" component={Example} /> */}
+						<Stack.Screen
+							name="SettingsScreen"
+							component={SettingsScreen}
+							options={{ animation: "slide_from_right" }}
+						/>
 					</>
 				)}
 			</Stack.Navigator>
