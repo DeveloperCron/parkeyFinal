@@ -5,6 +5,9 @@ import axios from "axios"
 import { Divider } from "react-native-paper"
 import PlaceItem from "./PlaceItem"
 import { colors } from "@/theme"
+import SkeletonList from "../SkeletonList"
+
+// Skeleton content, waits until the fetching is done
 
 const GOOGLE_PLACES_API_BASE_URL = "https://maps.googleapis.com/maps/api/place"
 const API_KEY = "AIzaSyCWIrR-oS50Gi1Ot1fC6UeONYwyheHbyZU"
@@ -25,10 +28,12 @@ export interface GooglePlaceFlatlistProps {
 }
 const GooglePlaceFlatlist: FC<GooglePlaceFlatlistProps> = ({ searchResult, placeSelected, ...rest }) => {
 	const [predictions, setPredictions] = useState<PredictionType[]>([])
+	const [isFetching, setIsFetching] = useState<boolean>(true)
 
 	const requestPlaces = async (): Promise<void> => {
 		if (!searchResult || searchResult.length < 4) return
 
+		setIsFetching(true)
 		const apiUrl = `${GOOGLE_PLACES_API_BASE_URL}/autocomplete/json?key=${API_KEY}&input=${searchResult}`
 		try {
 			const result = await axios.request({
@@ -40,9 +45,10 @@ const GooglePlaceFlatlist: FC<GooglePlaceFlatlistProps> = ({ searchResult, place
 				const { predictions }: { predictions: PredictionType[] } = result.data
 				setPredictions(predictions)
 
-				console.log(predictions)
+				setIsFetching(false)
 			}
 		} catch (e) {
+			setIsFetching(false)
 			console.log(e)
 		}
 	}
@@ -52,13 +58,17 @@ const GooglePlaceFlatlist: FC<GooglePlaceFlatlistProps> = ({ searchResult, place
 		requestPlaces()
 	}, [searchResult])
 
-	return (
+	return isFetching ? (
+		<SkeletonList renders={5} />
+	) : (
 		<FlatList
 			{...rest}
 			style={$flatListStyle}
 			data={predictions}
 			ItemSeparatorComponent={Divider}
-			renderItem={({ item }) => <PlaceItem placeName={item.description} onPress={() => placeSelected(item)} />}
+			renderItem={({ item }) => (
+				<PlaceItem placeName={item.description} onPlaceItemPress={() => placeSelected(item)} />
+			)}
 			keyExtractor={(item) => item.place_id.toString()}
 		/>
 	)

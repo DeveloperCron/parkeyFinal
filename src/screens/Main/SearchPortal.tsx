@@ -12,7 +12,7 @@ import useStorage from "@/hooks/useStorage"
 
 interface SearchPortalProps {
 	onCloseButtonPress: () => void
-	onPlaceChosen: () => void
+	onPlaceChosen: (item: PredictionType) => void
 }
 
 const CloseButton: FC<{ onPress: () => void }> = ({ onPress }) => (
@@ -26,11 +26,6 @@ const SearchPortal: FC<SearchPortalProps> = ({ onCloseButtonPress, onPlaceChosen
 	const searchboxRef = useRef<React.ElementRef<typeof GooglePlaceSearchbox>>(null)
 	const { insert, retrieveItems } = useStorage()
 	const { t } = useTranslation(["map"])
-
-	const onPlaceItemPress = useCallback((item: PredictionType) => {
-		insert(item)
-		console.log(retrieveItems())
-	}, [])
 
 	return (
 		<Portal.Host>
@@ -54,7 +49,7 @@ const SearchPortal: FC<SearchPortalProps> = ({ onCloseButtonPress, onPlaceChosen
 						/>
 					</View>
 					<View style={styles.portalBody}>
-						<GooglePlacesFlatList searchResult={searchResult} placeSelected={onPlaceItemPress} />
+						<GooglePlacesFlatList searchResult={searchResult} placeSelected={onPlaceChosen} />
 					</View>
 				</Animated.View>
 			</View>

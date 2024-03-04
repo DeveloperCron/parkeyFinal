@@ -1,24 +1,29 @@
 import React, { FC } from "react"
-import { View, TextStyle, ViewStyle } from "react-native"
+import { TextStyle, ViewStyle, Pressable, PressableProps } from "react-native"
 import { Text } from "@/components/Text"
 
 import Icon from "react-native-vector-icons/FontAwesome6"
 import { colors } from "@/theme"
 
-export interface RecentItemProps {
+export interface RecentItemProps extends PressableProps {
 	/**
 	 * The place name you want to display
 	 */
 	placeName: string
+	onRecentItemPress: () => void
 }
-const RecentItem: FC<RecentItemProps> = ({ placeName, ...props }) => {
+const RecentItem: FC<RecentItemProps> = ({ placeName, onRecentItemPress }) => {
 	return (
-		<View style={$container}>
+		<Pressable
+			style={$container}
+			onPress={onRecentItemPress}
+			android_ripple={{ color: colors.palette.neutral300, borderless: false }}
+		>
 			<Icon name="clock-rotate-left" size={22} color={colors.palette.neutral800} />
 			<Text weight="bold" size="xs" style={$textStyle}>
 				{placeName}
 			</Text>
-		</View>
+		</Pressable>
 	)
 }
 
@@ -29,6 +34,7 @@ const $container: ViewStyle = {
 	alignItems: "center",
 	flexDirection: "row",
 	gap: 10,
+	backgroundColor: colors.palette.neutral100,
 }
 
 const $textStyle: TextStyle = {

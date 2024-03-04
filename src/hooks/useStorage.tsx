@@ -7,13 +7,12 @@ export interface useStorageHook {
 	insert(item: PredictionType): void
 	// remove(item: PredictionType): void
 	retrieveItems(): PredictionType[]
-	// removeAll(): void
+	removeAll(): void
 }
 
 export function useStorage(): useStorageHook {
 	const insert = (item: PredictionType) => {
 		let serializedArray: PredictionType[] = recentPlaces.getArray(RECENT_PLACES_KEY)
-		console.log(serializedArray)
 
 		if (serializedArray == null) {
 			serializedArray = [item]
@@ -26,12 +25,16 @@ export function useStorage(): useStorageHook {
 		recentPlaces.setArray(RECENT_PLACES_KEY, serializedArray)
 	}
 
+	const removeAll = () => {
+		recentPlaces.setArray(RECENT_PLACES_KEY, [])
+	}
+
 	const retrieveItems = () => {
 		const serializedArray: PredictionType[] = recentPlaces.getArray(RECENT_PLACES_KEY)
 		return serializedArray
 	}
 
-	return { insert, retrieveItems }
+	return { insert, retrieveItems, removeAll }
 }
 
 const checkForDuplicates = (dictionary: PredictionType[], item: PredictionType) => {
