@@ -20,7 +20,7 @@ const LocationButton: FC<LocationButtonProps> = ({
 }) => {
 	return (
 		<AnimatedPressable
-			android_ripple={{ color: colors.palette.neutral300, borderless: false }}
+			android_ripple={{ color: colors.palette.neutral300, borderless: false, radius: 35 }}
 			style={[$pressableStyle, { bottom: bottomInset }]}
 			{...props}
 			entering={FadeInRight.duration(120).springify().mass(0.3)}

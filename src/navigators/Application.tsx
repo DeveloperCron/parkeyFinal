@@ -42,6 +42,11 @@ function ApplicationNavigator() {
 				{currentUser ? (
 					<>
 						<Stack.Screen name="MapScreen" component={MapScreen} />
+						<Stack.Screen
+							name="SettingsScreen"
+							component={SettingsScreen}
+							options={{ animation: "slide_from_right" }}
+						/>
 					</>
 				) : (
 					<>
@@ -49,14 +54,15 @@ function ApplicationNavigator() {
 							name="LoginScreen"
 							component={LoginScreen}
 							options={{
-								animation: "simple_push",
+								animation: "fade",
 							}}
 						/>
-						<Stack.Screen name="RegisterScreen" component={RegisterScreen} />
 						<Stack.Screen
-							name="SettingsScreen"
-							component={SettingsScreen}
-							options={{ animation: "slide_from_right" }}
+							name="RegisterScreen"
+							component={RegisterScreen}
+							options={{
+								animation: "fade",
+							}}
 						/>
 					</>
 				)}

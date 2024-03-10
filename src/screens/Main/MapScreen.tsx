@@ -1,26 +1,25 @@
 // Importing necessary modules and types
-import React, { FC, useCallback, useEffect, useRef, useMemo, useState } from "react"
-import { observer } from "mobx-react-lite"
-import crashlytics from "@react-native-firebase/crashlytics"
-import MapView, { PROVIDER_GOOGLE, Region, Marker, LatLng } from "react-native-maps"
-import { PermissionsAndroid, Platform, StyleSheet, View, Pressable } from "react-native"
-import Geolocation, { GeoError, GeoPosition } from "react-native-geolocation-service"
-import { LocationButton } from "@/components"
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet"
-import { Screen } from "@/components"
-import SearchPortal from "@/screens/Main/SearchPortal"
-import RecentPlacesFlatList from "@/components/recentPlaces/RecentPlacesFlatList"
-import { colors } from "@/theme"
-import { PredictionType } from "@/components/googlePlaces/GooglePlacesFlatList"
-import { usePlaceDetails } from "@/hooks/usePlaceDetails"
+import { LocationButton, Screen } from "@/components"
 import FakeSearchbox from "@/components/googlePlaces/FakeSearchbox"
-import { GATES_DICTIONARY } from "@/constants"
+import { PredictionType } from "@/components/googlePlaces/GooglePlacesFlatList"
+import RecentPlacesFlatList from "@/components/recentPlaces/RecentPlacesFlatList"
+import { GATES_DICTIONARY, GateMarkerType } from "@/constants"
+import { usePlaceDetails } from "@/hooks/usePlaceDetails"
+import SearchPortal from "@/screens/Main/SearchPortal"
+import { colors } from "@/theme"
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet"
+import crashlytics from "@react-native-firebase/crashlytics"
+import { observer } from "mobx-react-lite"
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { PermissionsAndroid, Platform, Pressable, StyleSheet, View } from "react-native"
+import Geolocation, { GeoError, GeoPosition } from "react-native-geolocation-service"
+import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps"
 
-import FeatherIcon from "react-native-vector-icons/Feather"
-import Ionicons from "react-native-vector-icons/Ionicons"
-import FAIcon from "react-native-vector-icons/FontAwesome6"
 import useStorage from "@/hooks/useStorage"
 import { AppStackNavigator } from "@/navigators/Application"
+import FeatherIcon from "react-native-vector-icons/Feather"
+import FAIcon from "react-native-vector-icons/FontAwesome6"
+import GatePortal, { GatePortalRef } from "./GatePortal"
 
 // Constants
 const ANIMATION_DURATION = 1000
@@ -37,13 +36,10 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen({ navigation }
 	// State and ref declarations
 	const [searchPortalVisible, setSearchPortalVisible] = useState<boolean>(false)
 	const [searchResultLocation, setSearchResultLocation] = useState<Region | undefined>(undefined)
-	const [currentUserLocation, setCurrentUserLocation] = useState<LatLng>({
-		latitude: 32.6432432466,
-		longitude: 32.58283,
-	})
 	const [index, setIndex] = useState<number>(0)
 	const bottomSheetRef = useRef<BottomSheet>(null)
 	const mapRef = useRef<MapView>(null)
+	const gatePortalRef = useRef<GatePortalRef>(null)
 	const snapPoints = useMemo(() => ["15%", "40%", "60%"], [])
 	const { insert } = useStorage()
 
@@ -105,7 +101,6 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen({ navigation }
 		Geolocation.getCurrentPosition(
 			(position: GeoPosition) => {
 				const { coords } = position
-				setCurrentUserLocation(coords)
 
 				mapRef.current?.animateToRegion(
 					{
@@ -198,6 +193,15 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen({ navigation }
 		fetchDetails()
 	}, [])
 
+	const onMarkerSelected = useCallback((item: GateMarkerType) => {
+		if (gatePortalRef.current) {
+			gatePortalRef.current.fetchPlaceDetails(item).then(() => {
+				// Typeshit stuff here
+				if (gatePortalRef.current) gatePortalRef.current.handlePortalVisibility()
+			})
+		}
+	}, [])
+
 	return (
 		<Screen contentContainerStyle={styles.container}>
 			{/* MapView component */}
@@ -205,18 +209,25 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen({ navigation }
 				provider={PROVIDER_GOOGLE}
 				style={styles.map}
 				loadingEnabled
+				showsUserLocation
+				showsMyLocationButton={false}
 				loadingIndicatorColor={colors.palette.neutral400}
 				onMapLoaded={getCurrentUserPosition}
 				ref={mapRef}
 			>
 				{/** User location marker */}
-				<Marker key={index} coordinate={currentUserLocation} tracksViewChanges={false} title="Your location">
-					<Ionicons name="location-sharp" size={35} color={colors.palette.Blue[400]} />
-				</Marker>
+				{/* <Marker key={index} coordinate={currentUserLocation} tracksViewChanges={false} title="Your location">
+					<FAIcon name="location-dot" size={35} color={colors.palette.Blue[400]} />
+				</Marker> */}
 
 				{GATES_DICTIONARY.map((item, index) => (
-					<Marker key={index} coordinate={item.coords} tracksViewChanges={false}>
-						<FAIcon name="square-parking" size={30} color={colors.palette.neutral700} />
+					<Marker
+						key={index}
+						coordinate={item.coords}
+						tracksViewChanges={false}
+						onPress={() => onMarkerSelected(item)}
+					>
+						<FAIcon name="square-parking" size={30} color={colors.palette.neutral900} />
 					</Marker>
 				))}
 			</MapView>
@@ -229,7 +240,6 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen({ navigation }
 				ref={bottomSheetRef}
 				onChange={handleSheetChanges}
 				enableContentPanningGesture={false}
-				index={index}
 				snapPoints={snapPoints}
 			>
 				<BottomSheetView style={styles.bottomSheetContainer}>
@@ -251,6 +261,7 @@ const MapScreen: FC<MapScreenProps> = observer(function MapScreen({ navigation }
 			{searchPortalVisible && (
 				<SearchPortal onCloseButtonPress={handleSearchboxVisibility} onPlaceChosen={onPlaceSelected} />
 			)}
+			<GatePortal ref={gatePortalRef} />
 		</Screen>
 	)
 })

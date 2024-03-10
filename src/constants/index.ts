@@ -162,12 +162,12 @@ export const MAP_STYLING = [
 	},
 ]
 
-export type GateProps = {
+export type GateMarkerType = {
 	place_id: string
 	coords: LatLng
 }
 
-export const GATES_DICTIONARY: GateProps[] = [
+export const GATES_DICTIONARY: GateMarkerType[] = [
 	{
 		place_id: "ChIJD-ON5V04HRURTUeqmfNG2vc",
 		coords: {

@@ -1,6 +1,10 @@
 import axios, { AxiosResponse } from "axios"
+import crashlytics from "@react-native-firebase/crashlytics"
+import { string } from "zod"
+import { instance } from "@/services/instance"
 
 const GOOGLE_PLACES_API_BASE_URL = "https://maps.googleapis.com/maps/api/place/details/json"
+const BASE_PLACE_PHOTO_URL = "https://maps.googleapis.com/maps/api/place/photo?"
 const API_KEY = "AIzaSyCWIrR-oS50Gi1Ot1fC6UeONYwyheHbyZU"
 
 interface AddressComponent {
@@ -47,7 +51,7 @@ interface PlusCode {
 	global_code: string
 }
 
-interface Result {
+export interface Result {
 	address_components: AddressComponent[]
 	adr_address: string
 	business_status: string
@@ -67,6 +71,7 @@ interface Result {
 		periods: OpeningHoursPeriod[]
 		weekday_text: string[]
 	}
+	wheelchair_accessible_entrance: boolean
 	photos: Photo[]
 	place_id: string
 	plus_code: PlusCode
@@ -81,18 +86,20 @@ interface Result {
 	website: string
 }
 
+interface FetchError {
+	code: string
+	message: string
+}
+
 export interface PlaceDetailsResponse {
 	html_attributions: string[]
 	result: Result
 	status: string
 }
+
 export interface usePlaceDetailsHook {
-	/**
-	 *
-	 * 	@param placeId string we get it from the place from the autocomplete
-	 *	the any type is just broken
-	 */
-	getDetails(placeId: string): Promise<AxiosResponse<PlaceDetailsResponse, any>>
+	getDetails(placeId: string): Promise<AxiosResponse<PlaceDetailsResponse, FetchError>>
+	retrieveImageFromReference(reference: string): Promise<string | undefined>
 }
 
 export function usePlaceDetails(): usePlaceDetailsHook {
@@ -101,16 +108,33 @@ export function usePlaceDetails(): usePlaceDetailsHook {
 
 		try {
 			const response = await axios.request({
-				method: "get", // Assuming you are making a GET request
+				method: "get",
 				url: apiUrl,
 			})
 
 			return response
-		} catch (e) {
-			console.error(e)
-			throw e // Re-throw the error to propagate it to the caller
+		} catch (err: unknown) {
+			const knownError = err as FetchError
+			crashlytics().log(knownError.code)
+			throw knownError // Re-throw the error to maintain the expected return type
 		}
 	}
 
-	return { getDetails }
+	const retrieveImageFromReference = async (reference: string) => {
+		const apiUrl = `${BASE_PLACE_PHOTO_URL}maxwidth=400&maxheight=400&photo_reference=${reference}&key=${API_KEY}`
+
+		try {
+			const response = await axios.request({
+				method: "get",
+				url: apiUrl,
+			})
+
+			return response.config.url // Accessing the request URL from the Axios response
+		} catch (err: unknown) {
+			const knownError = err as FetchError
+			crashlytics().log(knownError.code)
+			throw knownError // Re-throw the error to maintain the expected return type
+		}
+	}
+	return { getDetails, retrieveImageFromReference }
 }
